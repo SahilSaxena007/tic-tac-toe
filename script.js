@@ -115,26 +115,66 @@ function Player(name, sign){
 
 }
 
-function Display(){
-    const ClearBoard = (board)=>{
-
-    }
-    return {};
-}
 
 function Game(){
     const board = GameBoard();
-    const display = Display();
+    // const display = Display();
     let player1, player2, currentPlayer;
 
     const NewGame = ()=>{
-        // Clear the Board over here and clear the score
         const player1Name = prompt("Player 1 name: ");
         player1 = Player(player1Name,'x');
         const player2Name = prompt("Player 2 name: ");
         player2 = Player(player2Name,'O');
         currentPlayer = player1;
         playRound();
+    }
+
+    const playRound = ()=>{
+        board.clearBoard();
+        playTurn();
+    }
+
+    const playTurn = ()=>{
+        console.log(board.printBoard());
+        console.log(`${player1.getName()}: ${player1.getScore()}   ${player2.getName()}: ${player2.getScore()}`);
+        console.log(`${getCurrentPlayer().getName()}'s turn`);
+        Turn();
+    }
+
+    const Turn = ()=>{
+        const token = getCurrentPlayer().getSign();
+        console.log(`Your Token: ${token}`);
+        let row, col;
+    
+        do {
+            row = parseInt(prompt("Enter row number (1/3): ")) - 1;
+            col = parseInt(prompt("Enter col number (1/3): ")) - 1;
+        }while (!board.checkNull(row,col));
+
+        board.placeToken(token, row, col);
+        
+        if (board.checkRoundWinner()){
+            console.log(`Round Over! The Winner is: ${currentPlayer.getName()}`);
+            currentPlayer.incrementScore();
+            if (checkGameWinner()){
+                console.log(`GAME OVER! WINNER ${currentPlayer.getName()}`);
+                NewGame();
+            }else{
+                playRound();
+            }
+            
+        }else{
+            changeCurrentPlayer();
+            playTurn();                       
+        }
+    }
+
+    const checkGameWinner = ()=>{
+        if (player1.getScore() === 2 || player2.getScore() === 2){
+            return true;
+        }
+        return false;
     }
 
     const changeCurrentPlayer = ()=>{
@@ -145,63 +185,9 @@ function Game(){
         return currentPlayer;
     }
 
-    const playRound = ()=>{
-        board.clearBoard();
-        playTurn();
-        
-        
-    }
-
-    const playTurn = ()=>{
-        console.log(board.printBoard());
-        console.log(`${player1.getName()}: ${player1.getScore()}   ${player1.getName()}: ${player2.getScore()}`);
-        console.log(`${getCurrentPlayer().getName()}'s turn`);
-        Round();
-    }
-
-    const Round = ()=>{
-        const token = getCurrentPlayer().getSign();
-        console.log(`Your Token: ${token}`);
-        let row, col;
-        do {
-            row = parseInt(prompt("Enter row number (1/3): ")) - 1;
-            col = parseInt(prompt("Enter col number (1/3): ")) - 1;
-
-        }while (!board.checkNull(row,col));
-        
-        board.placeToken(token,row, col);
-        if (board.checkRoundWinner(token)){
-            console.log(`Round Over! The Winner is: ${getCurrentPlayer().getName()}`);
-            getCurrentPlayer().incrementScore();
-            if (getCurrentPlayer().getScore() === 3){
-                console.log(`GAME OVER! The Winner is ${getCurrentPlayer().getName()}`);
-                NewGame();
-            }else{
-                console.log("Starting new round...")
-                playRound();
-            }
-        }else if (board.isFilled()){
-            console.log("Starting new round...")
-            playRound();
-
-        }else{
-            changeCurrentPlayer();       
-            playTurn(); 
-        }
-        
-    }
-
-    const restartPrompt = ()=>{
-        let continuePlay = prompt("New Round(y/n)");
-        if (continuePlay === 'y'){
-            return true;
-        }
-        return false;
-    }
-
     NewGame();
 
-    return {changeCurrentPlayer, getCurrentPlayer, restartPrompt};
+    return {changeCurrentPlayer, getCurrentPlayer};
 
 }
 
