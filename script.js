@@ -115,13 +115,27 @@ function Player(name, sign){
 
 }
 
+function Display(){
+    const ClearBoard = (board)=>{
+
+    }
+    return {};
+}
+
 function Game(){
     const board = GameBoard();
-    const player1Name = prompt("Player 1 name: ");
-    let player1 = Player(player1Name,'x');
-    const player2Name = prompt("Player 2 name: ");
-    let player2 = Player(player2Name,'O');
-    let currentPlayer = player1;
+    const display = Display();
+    let player1, player2, currentPlayer;
+
+    const NewGame = ()=>{
+        // Clear the Board over here and clear the score
+        const player1Name = prompt("Player 1 name: ");
+        player1 = Player(player1Name,'x');
+        const player2Name = prompt("Player 2 name: ");
+        player2 = Player(player2Name,'O');
+        currentPlayer = player1;
+        playRound();
+    }
 
     const changeCurrentPlayer = ()=>{
         currentPlayer = currentPlayer === player1 ? player2 : player1;
@@ -132,8 +146,15 @@ function Game(){
     }
 
     const playRound = ()=>{
+        board.clearBoard();
+        playTurn();
+        
+        
+    }
+
+    const playTurn = ()=>{
         console.log(board.printBoard());
-        console.log(`Player 1: ${player1.getScore()}   Player 2: ${player2.getScore()}`);
+        console.log(`${player1.getName()}: ${player1.getScore()}   ${player1.getName()}: ${player2.getScore()}`);
         console.log(`${getCurrentPlayer().getName()}'s turn`);
         Round();
     }
@@ -154,26 +175,18 @@ function Game(){
             getCurrentPlayer().incrementScore();
             if (getCurrentPlayer().getScore() === 3){
                 console.log(`GAME OVER! The Winner is ${getCurrentPlayer().getName()}`);
-                if (restartPrompt()){
-                    board.clearBoard();
-                    player1.resetScore();
-                    player2.resetScore();
-                    console.log("Starting new Game: ...");
-                    playRound();
-                }
+                NewGame();
             }else{
-                board.clearBoard();
-                console.log("Starting new Round: ...");
+                console.log("Starting new round...")
                 playRound();
             }
         }else if (board.isFilled()){
-            board.clearBoard();
-            console.log("Starting new Round: ...");
+            console.log("Starting new round...")
             playRound();
 
         }else{
             changeCurrentPlayer();       
-            playRound(); 
+            playTurn(); 
         }
         
     }
@@ -186,7 +199,7 @@ function Game(){
         return false;
     }
 
-    playRound();
+    NewGame();
 
     return {changeCurrentPlayer, getCurrentPlayer, restartPrompt};
 
