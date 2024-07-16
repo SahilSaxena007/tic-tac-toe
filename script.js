@@ -180,6 +180,7 @@ function Game(){
             updateScreen();
             ButtonDiv = document.querySelector('.buttons>button');
             ButtonDiv.textContent = 'New Round';
+            result_div.textContent = `TIE ROUND`
             active = false;
         }else{
             changeCurrentPlayer();
