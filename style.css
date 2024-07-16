@@ -29,6 +29,21 @@
     color: #d9d9d9;
 }
 
+.title_window{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+}
+
+#result{
+    font-size: 40px;
+    font-weight: 600;
+}
+
+
+
 .title{
     display: flex;
     justify-content: center;

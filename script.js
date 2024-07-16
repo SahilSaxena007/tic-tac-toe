@@ -132,6 +132,7 @@ function Game(){
     const playRound = ()=>{
         board.clearBoard();
         updateScreen(); // Update the UI board
+        playTurn();
     }
 
     const playTurn = ()=>{
@@ -147,13 +148,17 @@ function Game(){
         board.placeToken(token, row, col);
         
         if (board.checkRoundWinner()){
+            updateScreen();
             console.log(`Round Over! The Winner is: ${currentPlayer.getName()}`);
             currentPlayer.incrementScore();
+            const gameWin = checkGameWinner();
             if (checkGameWinner()){
                 console.log(`GAME OVER! WINNER ${currentPlayer.getName()}`);
-                NewGame();
+                ButtonDiv = document.querySelector('.buttons>button');
+                ButtonDiv.textContent = 'New Game';
             }else{
-                playRound();
+                ButtonDiv = document.querySelector('.buttons>button');
+                ButtonDiv.textContent = 'New Round';
             }
         }else{
             changeCurrentPlayer();
@@ -162,7 +167,7 @@ function Game(){
     }
 
     const checkGameWinner = ()=>{
-        if (player1.getScore() === 2 || player2.getScore() === 2){
+        if (player1.getScore() >= 3 || player2.getScore() >= 3){
             return true;
         }
         return false;
@@ -189,28 +194,43 @@ function Game(){
         console.log(board.printBoard());
     }
 
-    NewGame();
+    const getBoard = () => {
+        return board.getBoard();
+    }
 
-    return {Turn};
+    // Expose Turn method and updateScreen function
+    return {Turn, updateScreen, getBoard, NewGame, playRound};
 }
 
 function screenController(){
     const game = Game();
-    const playerTurnDiv = document.querySelector('.buttons>button');
+    const ButtonDiv = document.querySelector('.buttons>button');
     const cells = document.querySelectorAll('.cell');
 
     const clickHandlerBoard = (e) => {
         const cellId = e.target.id;
         const [row, col] = cellId.split('-').map(Number);
-        game.Turn(row, col);
+        if (game.getBoard()[row][col]===null){
+            game.Turn(row, col);
+
+        }
+        
     }
 
     cells.forEach(cell => {
         cell.addEventListener('click', clickHandlerBoard);
     });
 
-    playerTurnDiv.addEventListener('click', () => {
-        game.NewGame();
+    ButtonDiv.addEventListener('click', () => {
+        const text = ButtonDiv.textContent;
+        if (text === 'New Game'){
+            game.NewGame();
+
+        }else if(text === 'New Round'){
+            game.playRound();
+            
+        }
+        
     });
 
     game.updateScreen();
