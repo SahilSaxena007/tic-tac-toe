@@ -38,7 +38,7 @@
 }
 
 #result{
-    font-size: 40px;
+    font-size: 30px;
     font-weight: 600;
 }
 
@@ -107,3 +107,36 @@
     
     
 }
+
+#dialog {
+    display: none;
+    position: absolute;
+    margin-top: 20%;
+    left: 20%;
+    height: 200px;
+    width: 200px;
+}
+
+.dialog-content{
+    display: grid;
+    justify-content: center;
+    gap: 15px;
+    background-color: gray;
+    border-radius: 10px;
+    box-shadow: 0 0 100px rgba(0, 0, 0, 0.5); /* Cool shadow effect */
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+
+
+.dialog-content>p{
+    margin-top: 20px;
+    font-weight: 600;
+}
+
+#dialogSubmit{
+    margin-bottom: 10px;
+    height: 80%;
+}
+
+

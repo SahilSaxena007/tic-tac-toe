@@ -119,23 +119,30 @@ function Player(name, sign){
 function Game(){
     const board = GameBoard();
     let player1, player2, currentPlayer;
+    let active= false;
+    let result_div = document.querySelector('#result');
+    
 
     const NewGame = ()=>{
-        const player1Name = prompt("Player 1 name: ");
+        const player1Name = prompt("Player X name: ");
         player1 = Player(player1Name,'X');
-        const player2Name = prompt("Player 2 name: ");
+        const player2Name = prompt("Player O name: ");
         player2 = Player(player2Name,'O');
         currentPlayer = player1;
         playRound();
+
     }
 
     const playRound = ()=>{
         board.clearBoard();
-        updateScreen(); // Update the UI board
+        updateScreen();
+        result_div.textContent = `Start`;
         playTurn();
     }
 
     const playTurn = ()=>{
+        active = true;
+        result_div.textContent = `${currentPlayer.getName()}'s Turn (${currentPlayer.getSign()})`;
         console.log(board.printBoard());
         console.log(`${player1.getName()}: ${player1.getScore()}   ${player2.getName()}: ${player2.getScore()}`);
         console.log(`${getCurrentPlayer().getName()}'s turn`);
@@ -143,26 +150,40 @@ function Game(){
     }
 
     const Turn = (row, col)=>{
+        
+        console.log("TURN:"+active);
+        if (!active){
+            return;
+        }
         const token = getCurrentPlayer().getSign();
         console.log(`Your Token: ${token}`);
         board.placeToken(token, row, col);
         
         if (board.checkRoundWinner()){
             updateScreen();
-            console.log(`Round Over! The Winner is: ${currentPlayer.getName()}`);
+            result_div.textContent = `Round Winner - ${currentPlayer.getName()}`
             currentPlayer.incrementScore();
             const gameWin = checkGameWinner();
             if (checkGameWinner()){
-                console.log(`GAME OVER! WINNER ${currentPlayer.getName()}`);
                 ButtonDiv = document.querySelector('.buttons>button');
                 ButtonDiv.textContent = 'New Game';
+                active = false;
+                result_div.textContent = `Game Winner - ${currentPlayer.getName()}`
+                updateScreen();
             }else{
                 ButtonDiv = document.querySelector('.buttons>button');
                 ButtonDiv.textContent = 'New Round';
+                active = false;
+                updateScreen();
             }
+        }else if(board.isFilled()){
+            updateScreen();
+            ButtonDiv = document.querySelector('.buttons>button');
+            ButtonDiv.textContent = 'New Round';
+            active = false;
         }else{
             changeCurrentPlayer();
-            playTurn();                       
+            playTurn();                   
         }
     }
 
@@ -183,6 +204,12 @@ function Game(){
 
     const updateScreen = ()=>{
         const cells = document.querySelectorAll('.cell');
+        const x_score = document.querySelector('.x_score');
+        const o_score = document.querySelector('.o_score');
+
+        x_score.textContent = 'X : '+player1.getScore();
+        o_score.textContent = 'O : ' + player2.getScore();
+        
         cells.forEach((cell,index)=>{
             cell.textContent = '';
             const row = Math.floor(index/3);
@@ -191,15 +218,23 @@ function Game(){
             cell.textContent = value;
         });
 
+
         console.log(board.printBoard());
     }
+
+    function showDialog() {
+        const dialog = document.getElementById('dialog');
+        dialog.style.display = 'block'; // Show the dialog
+    }
+
 
     const getBoard = () => {
         return board.getBoard();
     }
 
+
     // Expose Turn method and updateScreen function
-    return {Turn, updateScreen, getBoard, NewGame, playRound};
+    return {Turn, updateScreen, getBoard, NewGame, playRound,active};
 }
 
 function screenController(){
@@ -208,6 +243,7 @@ function screenController(){
     const cells = document.querySelectorAll('.cell');
 
     const clickHandlerBoard = (e) => {
+        
         const cellId = e.target.id;
         const [row, col] = cellId.split('-').map(Number);
         if (game.getBoard()[row][col]===null){
@@ -216,6 +252,8 @@ function screenController(){
         }
         
     }
+
+    
 
     cells.forEach(cell => {
         cell.addEventListener('click', clickHandlerBoard);
