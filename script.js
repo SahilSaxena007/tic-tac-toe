@@ -118,12 +118,11 @@ function Player(name, sign){
 
 function Game(){
     const board = GameBoard();
-    // const display = Display();
     let player1, player2, currentPlayer;
 
     const NewGame = ()=>{
         const player1Name = prompt("Player 1 name: ");
-        player1 = Player(player1Name,'x');
+        player1 = Player(player1Name,'X');
         const player2Name = prompt("Player 2 name: ");
         player2 = Player(player2Name,'O');
         currentPlayer = player1;
@@ -132,26 +131,19 @@ function Game(){
 
     const playRound = ()=>{
         board.clearBoard();
-        playTurn();
+        updateScreen(); // Update the UI board
     }
 
     const playTurn = ()=>{
         console.log(board.printBoard());
         console.log(`${player1.getName()}: ${player1.getScore()}   ${player2.getName()}: ${player2.getScore()}`);
         console.log(`${getCurrentPlayer().getName()}'s turn`);
-        Turn();
+        updateScreen(); // Update the UI board
     }
 
-    const Turn = ()=>{
+    const Turn = (row, col)=>{
         const token = getCurrentPlayer().getSign();
         console.log(`Your Token: ${token}`);
-        let row, col;
-    
-        do {
-            row = parseInt(prompt("Enter row number (1/3): ")) - 1;
-            col = parseInt(prompt("Enter col number (1/3): ")) - 1;
-        }while (!board.checkNull(row,col));
-
         board.placeToken(token, row, col);
         
         if (board.checkRoundWinner()){
@@ -163,7 +155,6 @@ function Game(){
             }else{
                 playRound();
             }
-            
         }else{
             changeCurrentPlayer();
             playTurn();                       
@@ -185,11 +176,44 @@ function Game(){
         return currentPlayer;
     }
 
+    const updateScreen = ()=>{
+        const cells = document.querySelectorAll('.cell');
+        cells.forEach((cell,index)=>{
+            cell.textContent = '';
+            const row = Math.floor(index/3);
+            const col = index%3;
+            const value = board.getBoard()[row][col];
+            cell.textContent = value;
+        });
+
+        console.log(board.printBoard());
+    }
+
     NewGame();
 
-    return {changeCurrentPlayer, getCurrentPlayer};
-
+    return {Turn};
 }
 
+function screenController(){
+    const game = Game();
+    const playerTurnDiv = document.querySelector('.buttons>button');
+    const cells = document.querySelectorAll('.cell');
 
-const game = Game();
+    const clickHandlerBoard = (e) => {
+        const cellId = e.target.id;
+        const [row, col] = cellId.split('-').map(Number);
+        game.Turn(row, col);
+    }
+
+    cells.forEach(cell => {
+        cell.addEventListener('click', clickHandlerBoard);
+    });
+
+    playerTurnDiv.addEventListener('click', () => {
+        game.NewGame();
+    });
+
+    game.updateScreen();
+}
+
+screenController();
